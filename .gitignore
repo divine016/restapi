@@ -1,2 +1,3 @@
 server.env
 /node_modules
+/elevatorService/node_modules
