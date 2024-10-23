@@ -14,7 +14,7 @@ require("./swagger/swagger")(app);
 // Import elevator router
 require("./routers/elevator.router")(router);
 
-// Base path for the routes 
+// Base path for the routes
 app.use("/api/authenticationService", router);
 
 module.exports = { app };
