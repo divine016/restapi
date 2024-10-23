@@ -7,6 +7,8 @@ dotenv.config({
 
 const { app } = require("./app");
 
-app.listen(process.env.ELEVATOR_SERVICE_PORT, () => {
+const port = process.env.ELEVATOR_SERVICE_PORT || 8000;
+
+app.listen(port, () => {
   console.log(`Authentication-service is running on port ${process.env.ELEVATOR_SERVICE_PORT}`);
 });

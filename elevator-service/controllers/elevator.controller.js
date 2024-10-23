@@ -26,34 +26,35 @@ module.exports = {
  */
 async function statusCheck(req, res) {
   try {
-    const { elevatorId } = req.query;
+    res.status(200).json({ message: "Elevator is working!" })
+    // const { elevatorId } = req.query;
 
-    const queryStatus = `SELECT elev."elevatorId", elev."currentFloor", elev."statusId", stat."status", elev."direction", elev."targetFloor", elev."updatedAt", elev."active", elev."queue" FROM "ElevatorState" elev 
-      INNER JOIN "Status" stat ON elev."statusId" = stat."statusId" 
-      WHERE "elevatorId"=${elevatorId};`;
+    // const queryStatus = `SELECT elev."elevatorId", elev."currentFloor", elev."statusId", stat."status", elev."direction", elev."targetFloor", elev."updatedAt", elev."active", elev."queue" FROM "ElevatorState" elev 
+    //   INNER JOIN "Status" stat ON elev."statusId" = stat."statusId" 
+    //   WHERE "elevatorId"=${elevatorId};`;
 
-    const result = await sequelize.query(queryStatus);
+    // const result = await sequelize.query(queryStatus);
 
-    if (result[0].length === 0) {
-      const createQuery = `INSERT INTO "ElevatorState" ("elevatorId", "currentFloor", "statusId", "active" ) VALUES
-      (${elevatorId}, 0, 1, true);`;
+    // if (result[0].length === 0) {
+    //   const createQuery = `INSERT INTO "ElevatorState" ("elevatorId", "currentFloor", "statusId", "active" ) VALUES
+    //   (${elevatorId}, 0, 1, true);`;
 
-      const createElevator = await sequelize.query(createQuery);
-      res.send({
-        serviceName: "elevatorService",
-        message: "Elevator does not exist. Elevator created",
-        timestamp: Date.now(),
-      });
-    } else {
-      res.send({
-        serviceName: "elevatorService",
-        result: result[0],
-        message: "OK",
-        timestamp: Date.now(),
-      });
-    }
+    //   const createElevator = await sequelize.query(createQuery);
+    //   res.send({
+    //     serviceName: "elevatorService",
+    //     message: "Elevator does not exist. Elevator created",
+    //     timestamp: Date.now(),
+    //   });
+    // } else {
+    //   res.send({
+    //     serviceName: "elevatorService",
+    //     result: result[0],
+    //     message: "OK",
+    //     timestamp: Date.now(),
+    //   });
+    // }
   } catch (error) {
-    res.status(503).send();
+    return res.status(503).json({ message: "Service Unavailable" });
   }
 }
 
@@ -95,57 +96,58 @@ async function statusCheck(req, res) {
  */
 async function requestElevator(req, res) {
   try {
-    const { elevatorId, currentFloor, targetFloor } = req.body;
-    console.log(elevatorId);
-    const queryStatus = `SELECT elev."elevatorId", elev."currentFloor", elev."statusId", stat."status", elev."direction", elev."targetFloor", elev."updatedAt", elev."active", elev."queue" FROM "ElevatorState" elev INNER JOIN "Status" stat ON elev."statusId" = stat."statusId" WHERE "elevatorId"=${elevatorId};`;
+    res.status(200).json({ message: "Elevator requested successfully!" });
+    // const { elevatorId, currentFloor, targetFloor } = req.body;
+    // console.log(elevatorId);
+    // const queryStatus = `SELECT elev."elevatorId", elev."currentFloor", elev."statusId", stat."status", elev."direction", elev."targetFloor", elev."updatedAt", elev."active", elev."queue" FROM "ElevatorState" elev INNER JOIN "Status" stat ON elev."statusId" = stat."statusId" WHERE "elevatorId"=${elevatorId};`;
 
-    const result = await sequelize.query(queryStatus);
+    // const result = await sequelize.query(queryStatus);
 
-    if (result[0].length === 0) {
-      res.status(400).json({ message: "Elevator ID nnot found" });
-    } else {
-      let elevatorState = result[0][0];
+    // if (result[0].length === 0) {
+    //   res.status(400).json({ message: "Elevator ID nnot found" });
+    // } else {
+    //   let elevatorState = result[0][0];
 
-      console.log(elevatorState);
+    //   console.log(elevatorState);
 
-      if (elevatorState.statusId === 1) {
-        startTrip(req.body);
-      } else if (elevatorState.queue === null) {
-        const queue = [JSON.stringify(req.body)];
+    //   if (elevatorState.statusId === 1) {
+    //     startTrip(req.body);
+    //   } else if (elevatorState.queue === null) {
+    //     const queue = [JSON.stringify(req.body)];
 
-        const body = {
-          requestQueues: queue,
-        };
+    //     const body = {
+    //       requestQueues: queue,
+    //     };
 
-        const updateQuery = `UPDATE "ElevatorState" SET "queue" = '${JSON.stringify(
-          body
-        )}' WHERE "elevatorId"=${elevatorId}`;
+    //     const updateQuery = `UPDATE "ElevatorState" SET "queue" = '${JSON.stringify(
+    //       body
+    //     )}' WHERE "elevatorId"=${elevatorId}`;
 
-        const updateResult = await sequelize.query(updateQuery);
+    //     const updateResult = await sequelize.query(updateQuery);
 
-        console.log(updateResult);
-      } else {
-        const queue = elevatorState.queue;
+    //     console.log(updateResult);
+    //   } else {
+    //     const queue = elevatorState.queue;
 
-        queue.requestQueues.push(JSON.stringify(req.body));
+    //     queue.requestQueues.push(JSON.stringify(req.body));
 
-        const updateQuery = `UPDATE "ElevatorState" SET "queue" = '${JSON.stringify(
-          queue
-        )}' WHERE "elevatorId"=${elevatorId}`;
+    //     const updateQuery = `UPDATE "ElevatorState" SET "queue" = '${JSON.stringify(
+    //       queue
+    //     )}' WHERE "elevatorId"=${elevatorId}`;
 
-        console.log(updateQuery);
-        sequelize.query(updateQuery);
-      }
+    //     console.log(updateQuery);
+    //     sequelize.query(updateQuery);
+    //   }
 
-      res.send({
-        serviceName: "elevatorService",
-        result: elevatorState,
-        message: "OK",
-        timestamp: Date.now(),
-      });
-    }
+    //   res.send({
+    //     serviceName: "elevatorService",
+    //     result: elevatorState,
+    //     message: "OK",
+    //     timestamp: Date.now(),
+    //   });
+    // }
   } catch (error) {
-    console.log(error);
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 }
 
