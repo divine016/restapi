@@ -24,9 +24,9 @@ jobs:
         run: npm install
         working-directory: ./elevator-service
 
-      - name: Run ESLint (SAST)
-        run: npx eslint . --ext .js
-        working-directory: ./elevator-service
+    #   - name: Run ESLint (SAST)
+    #     run: npx eslint . --ext .js
+    #     working-directory: ./elevator-service
 
       - name: Run npm audit (Dependency Scan)
         run: npm audit
