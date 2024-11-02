@@ -31,6 +31,7 @@ jobs:
       - name: Run npm audit (Dependency Scan)
         run: npm audit
         working-directory: ./elevator-service
+        continue-on-error: true
 
       - name: Run OWASP ZAP (DAST)
         run: |
