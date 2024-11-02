@@ -7,13 +7,18 @@
     "test": "mocha **/*.test.js",
     "test-watch": "nodemon --exec 'npm test'",
     "start": "node server.js",
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "lint": "eslint . --ext .js",
+    "lint:fix": "eslint . --ext .js --fix"
   },
+  "type":"commonjs",
   "author": "",
   "dependencies": {
     "axios": "^0.26.1",
     "cors": "^2.8.5",
     "dotenv": "^16.0.0",
+    "eslint": "^8.56.0",
+    "eslint-plugin-security": "^1.7.1",
     "express": "^4.21.1",
     "express-rate-limit": "^7.4.1",
     "express-session": "^1.18.1",

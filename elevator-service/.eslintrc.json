@@ -11,6 +11,10 @@
     "plugins": [
       "security"
     ],
+    "parserOptions": {
+        "ecmaVersion": "latest",
+        "sourceType": "module"
+      },    
     "rules": {
       "security/detect-possible-timing-attacks": "error",
       "security/detect-eval-with-expression": "error",

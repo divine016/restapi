@@ -1,0 +1,6 @@
+
+node_modules/
+coverage/
+dist/
+build
+// No changes needed for the selected code as it is not a JavaScript file and the error is not related to the code in the open file.

@@ -10,3 +10,4 @@ module.exports = {
         allowedHeaders: ['Content-Type', 'Authorization']
     }
 };
+

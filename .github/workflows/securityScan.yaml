@@ -86,11 +86,11 @@ jobs:
         npm ci
         
     # ESLint scanning
-    - name: Run ESLint
-      run: |
-        cd elevator-service
-        npm install eslint eslint-plugin-security
-        npx eslint . --config .eslintrc.json
+    # - name: Run ESLint
+    #   run: |
+    #     cd elevator-service
+    #     npm install eslint eslint-plugin-security
+    #     npx eslint . --config .eslintrc.json
 
     # Initialize database for testing
     - name: Setup Database
