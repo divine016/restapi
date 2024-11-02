@@ -1,0 +1,38 @@
+name: Security Scan
+
+on:
+  push:
+    branches:
+      - kouts
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  security_scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'  # Use your Node.js version
+
+      - name: Install dependencies
+        run: npm install
+        working-directory: ./elevator-service
+
+      - name: Run ESLint (SAST)
+        run: npx eslint . --ext .js
+        working-directory: ./elevator-service
+
+      - name: Run npm audit (Dependency Scan)
+        run: npm audit
+        working-directory: ./elevator-service
+
+      - name: Run OWASP ZAP (DAST)
+        run: |
+          docker run -t owasp/zap2docker-stable zap-baseline.py -t http://localhost:3000 -r zap_report.html
+        working-directory: ./elevator-service
