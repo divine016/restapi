@@ -3,7 +3,10 @@ const app = express();
 const helmet = require("helmet");
 const cors = require("cors");
 const router = express.Router();
+// elevator-service/app.js
+const securityHeaders = require('./middleware/security');
 
+app.use(securityHeaders);
 app.use(cors());
 app.use(express.json());
 app.use(helmet());

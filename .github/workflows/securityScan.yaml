@@ -1,39 +1,132 @@
-name: Security Scan
+# name: Security Scan
+
+# on:
+#   push:
+#     branches:
+#       - kouts
+#   pull_request:
+#     branches:
+#       - main
+
+# jobs:
+#   security_scan:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v2
+
+#       - name: Set up Node.js
+#         uses: actions/setup-node@v2
+#         with:
+#           node-version: '14'  # Use your Node.js version
+
+#       - name: Install dependencies
+#         run: npm install
+#         working-directory: ./elevator-service
+
+#     #   - name: Run ESLint (SAST)
+#     #     run: npx eslint . --ext .js
+#     #     working-directory: ./elevator-service
+
+#       - name: Run npm audit (Dependency Scan)
+#         run: npm audit
+#         working-directory: ./elevator-service
+#         continue-on-error: true
+
+#       - name: Run OWASP ZAP (DAST)
+#         run: |
+#           docker run -t owasp/zap2docker-stable zap-baseline.py -t http://localhost:3000 -r zap_report.html
+#         working-directory: ./elevator-service
+
+
+
+
+# .github/workflows/security-pipeline.yml
+name: Security Scanning Pipeline
 
 on:
   push:
-    branches:
-      - kouts
+    branches: kouts
   pull_request:
-    branches:
-      - main
+    branches: main
+  schedule:
+    - cron: '0 0 * * 0'  # Run weekly on Sundays
 
 jobs:
-  security_scan:
+  security-scan:
     runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_password
+          POSTGRES_DB: test_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+    - uses: actions/checkout@v2
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: '14'  # Use your Node.js version
+    - name: Setup Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '18'
 
-      - name: Install dependencies
-        run: npm install
-        working-directory: ./elevator-service
+    # Install dependencies for both API and database
+    - name: Install Dependencies
+      run: |
+        cd elevator-service
+        npm ci
+        cd ../database
+        npm ci
+        
+    # ESLint scanning
+    - name: Run ESLint
+      run: |
+        cd elevator-service
+        npm install eslint eslint-plugin-security
+        npx eslint . --config .eslintrc.json
 
-    #   - name: Run ESLint (SAST)
-    #     run: npx eslint . --ext .js
-    #     working-directory: ./elevator-service
+    # Initialize database for testing
+    - name: Setup Database
+      run: |
+        cd database/scripts
+        PGPASSWORD=test_password psql -h localhost -U test_user -d test_db -f table.create.sql
+        PGPASSWORD=test_password psql -h localhost -U test_user -d test_db -f table.insert.sql
 
-      - name: Run npm audit (Dependency Scan)
-        run: npm audit
-        working-directory: ./elevator-service
-        continue-on-error: true
+    # Start the API for ZAP scanning
+    - name: Start API
+      run: |
+        cd elevator-service
+        npm start &
+        sleep 10
 
-      - name: Run OWASP ZAP (DAST)
-        run: |
-          docker run -t owasp/zap2docker-stable zap-baseline.py -t http://localhost:3000 -r zap_report.html
-        working-directory: ./elevator-service
+    # OWASP ZAP Scan
+    - name: ZAP Scan
+      uses: zaproxy/action-full-scan@v0.4.0
+      with:
+        target: 'http://localhost:3000'
+        rules_file_name: '.zap/rules.tsv'
+        cmd_options: '-a'
+
+    # Upload scan results
+    - name: Upload ZAP Report
+      uses: actions/upload-artifact@v2
+      with:
+        name: zap-scan-report
+        path: report.html
+
+    # Optional: Fail the build if high-severity issues are found
+    - name: Check ZAP Report
+      run: |
+        if grep -q "High" report.html; then
+          echo "High severity vulnerabilities found!"
+          exit 1
+        fi

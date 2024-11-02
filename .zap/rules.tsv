@@ -1,0 +1,3 @@
+// .zap/rules.tsv
+10020	IGNORE	(Cross-Site Request Forgery)
+10021	IGNORE	(X-Frame-Options Header)

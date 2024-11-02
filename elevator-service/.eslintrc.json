@@ -1,0 +1,26 @@
+// elevator-service/.eslintrc.json
+{
+    "env": {
+      "node": true,
+      "es2021": true
+    },
+    "extends": [
+      "eslint:recommended",
+      "plugin:security/recommended"
+    ],
+    "plugins": [
+      "security"
+    ],
+    "rules": {
+      "security/detect-possible-timing-attacks": "error",
+      "security/detect-eval-with-expression": "error",
+      "security/detect-non-literal-regexp": "error",
+      "security/detect-sql-literal-injection": "error",
+      "security/detect-non-literal-require": "error",
+      "security/detect-buffer-noassert": "error",
+      "security/detect-child-process": "error",
+      "security/detect-disable-mustache-escape": "error",
+      "security/detect-object-injection": "error",
+      "security/detect-new-buffer": "error"
+    }
+  }
